@@ -8,6 +8,7 @@ package com.jmduran.footballwithfriends.server.service.impl;
 
 import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Match.PlayerCallUp;
+import com.jmduran.footballwithfriends.server.models.Match.PlayerDiscard;
 import com.jmduran.footballwithfriends.server.models.Match.SimplyPlayer;
 import com.jmduran.footballwithfriends.server.models.Player;
 import com.jmduran.footballwithfriends.server.repositories.IMatchRepository;
@@ -78,6 +79,17 @@ public class MatchServiceImpl implements MatchService {
         match.setTeam1(teams.get(0));
         match.setTeam2(teams.get(1));
         
+        matchRepository.save(match);
+    }
+    
+    @Override
+    synchronized public void joinPlayerDiscards(String matchId, PlayerDiscard player) {
+        Match match = matchRepository.findById(matchId).get();
+        if (match.getDiscards() == null) {
+            List<PlayerDiscard> discards = new ArrayList<>();     
+            match.setDiscards(discards);
+        }        
+        match.getDiscards().add(player);
         matchRepository.save(match);
     }
 }

@@ -37,6 +37,7 @@ public class Match implements Serializable {
     String mvp;
     SimplyPlayer mister;
     Boolean cancelled;
+    List<PlayerDiscard> discards;
     
     @Data
     public static class PlayerCallUp {        
@@ -65,5 +66,11 @@ public class Match implements Serializable {
             this.id = id;
             this.fixed = fixed;
         }
+    }
+    
+    @Data
+    public static class PlayerDiscard {
+        PlayerCallUp player;
+        Boolean canPlay;
     }
 }

@@ -70,6 +70,13 @@ public class MatchesController {
         service.updateTeams(matchId, teams);
     }
     
+    @RequestMapping(value = "/{matchId}/player/discards", 
+                    method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public void joinPlayerDiscard(@PathVariable String matchId, @RequestBody Match.PlayerDiscard player){        
+        service.joinPlayerDiscards(matchId, player);
+    }
+    
     @RequestMapping(value = "", 
                     method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
