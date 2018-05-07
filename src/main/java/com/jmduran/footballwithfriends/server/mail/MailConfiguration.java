@@ -34,8 +34,8 @@ public class MailConfiguration {
         // mailSender.setPassword(password);
       
         //For Heroku deploy
-        String DB_username = System.getenv("FWF_MAIL_USERNAME");
-        String DB_password = System.getenv("FWF_MAIL_PASSWORD");
+        mailSender.setUsername(System.getenv("FWF_MAIL_USERNAME"));
+        mailSender.setUsername(System.getenv("FWF_MAIL_PASSWORD"));
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
