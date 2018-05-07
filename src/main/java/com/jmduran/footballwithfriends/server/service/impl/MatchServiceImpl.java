@@ -6,6 +6,7 @@
  */
 package com.jmduran.footballwithfriends.server.service.impl;
 
+import com.jmduran.footballwithfriends.server.mail.FWFMailSenderService;
 import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Match.PlayerCallUp;
 import com.jmduran.footballwithfriends.server.models.Match.PlayerDiscard;
@@ -24,20 +25,26 @@ public class MatchServiceImpl implements MatchService {
 
     @Autowired
     private IMatchRepository matchRepository;
+    
+    @Autowired
+    private FWFMailSenderService mailSender;
 
     @Override
     public void createMatch(Match match) {
         matchRepository.insert(match);
+        mailSender.sendMailToAll("FWF say hello", "Partido Creado");
     }
 
     @Override
     public void deleteMatch(String matchId) {
         matchRepository.deleteById(matchId);
+        mailSender.sendMailToAll("FWF say hello", "Partido Eliminado");
     }
 
     @Override
     public void updateMatch(Match match) {
         matchRepository.save(match);
+        mailSender.sendMailToAll("FWF say hello", "Partido Actualizado");
     }
 
     @Override
@@ -63,13 +70,13 @@ public class MatchServiceImpl implements MatchService {
         playerCallUp.setPlayer(simplyPlayer);
         match.getCallUp().add(playerCallUp);
         matchRepository.save(match);
+        mailSender.sendMail(player.getEmail(), "FWF say hello", "Te has unido al Partido " + match.getName());
     }
     
     @Override
     synchronized public void unJoinPlayerCallUp(String matchId, String playerId) {
         Match match = matchRepository.findById(matchId).get();
-        match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(playerId));
-        
+        match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(playerId));        
         matchRepository.save(match);
     }
 
@@ -80,6 +87,7 @@ public class MatchServiceImpl implements MatchService {
         match.setTeam2(teams.get(1));
         
         matchRepository.save(match);
+        mailSender.sendMailToAll("FWF say hello", "Equipos creados para el Partido " + match.getName());
     }
     
     @Override
