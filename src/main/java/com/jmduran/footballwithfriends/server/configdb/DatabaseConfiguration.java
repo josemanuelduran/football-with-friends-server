@@ -47,7 +47,7 @@ public class DatabaseConfiguration extends AbstractMongoConfiguration {
         // For local deploy
         // return database;
         // For Heroku deploy
-        return System.getenv("FWF_DB_DATABASE");
+        return "fwfdb";
     }
     @Override
     @Bean
