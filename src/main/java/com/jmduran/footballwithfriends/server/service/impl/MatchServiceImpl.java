@@ -70,7 +70,9 @@ public class MatchServiceImpl implements MatchService {
         playerCallUp.setPlayer(simplyPlayer);
         match.getCallUp().add(playerCallUp);
         matchRepository.save(match);
-        mailSender.sendMail(player.getEmail(), "FWF say hello", "Te has unido al Partido " + match.getName());
+        if (player.getEmail() != null && !player.getEmail().equals("")) {
+            mailSender.sendMail(player.getEmail(), "FWF say hello", "Te has unido al Partido " + match.getName());
+        }
     }
     
     @Override
