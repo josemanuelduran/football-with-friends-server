@@ -21,5 +21,6 @@ public interface MatchService {
     void unJoinPlayerCallUp(String matchId, String playerId);
     void updateTeams(String matchId, List<Match.Team> teams);
     void joinPlayerDiscards(String matchId, Match.PlayerDiscard player);
+    void unjoinPlayerDiscards(String matchId, String playerId);
     
 }

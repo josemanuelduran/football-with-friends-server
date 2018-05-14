@@ -102,4 +102,13 @@ public class MatchServiceImpl implements MatchService {
         match.getDiscards().add(player);
         matchRepository.save(match);
     }
+    
+    @Override
+    synchronized public void unjoinPlayerDiscards(String matchId, String playerId) {
+        Match match = matchRepository.findById(matchId).get();
+        if (match.getDiscards() != null) {
+            match.getDiscards().removeIf(item -> item.getPlayer().getPlayer().getId().equals(playerId));            
+            matchRepository.save(match);
+        }        
+    }
 }

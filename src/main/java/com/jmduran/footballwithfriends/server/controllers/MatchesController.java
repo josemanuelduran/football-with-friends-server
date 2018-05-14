@@ -70,11 +70,18 @@ public class MatchesController {
         service.updateTeams(matchId, teams);
     }
     
-    @RequestMapping(value = "/{matchId}/player/discards", 
+    @RequestMapping(value = "/{matchId}/discards", 
                     method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public void joinPlayerDiscard(@PathVariable String matchId, @RequestBody Match.PlayerDiscard player){        
         service.joinPlayerDiscards(matchId, player);
+    }
+    
+    @RequestMapping(value = "/{matchId}/discards/player/{playerId}", 
+                    method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public void unjoinPlayerDiscard(@PathVariable String matchId, @PathVariable String playerId){        
+        service.unjoinPlayerDiscards(matchId, playerId);
     }
     
     @RequestMapping(value = "", 
