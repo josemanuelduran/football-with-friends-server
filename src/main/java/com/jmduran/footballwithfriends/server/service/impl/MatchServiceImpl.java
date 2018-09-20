@@ -13,10 +13,13 @@ import com.jmduran.footballwithfriends.server.models.Match.PlayerDiscard;
 import com.jmduran.footballwithfriends.server.models.Match.SimplyPlayer;
 import com.jmduran.footballwithfriends.server.models.Player;
 import com.jmduran.footballwithfriends.server.repositories.IMatchRepository;
+import com.jmduran.footballwithfriends.server.repositories.IPlayerRepository;
 import com.jmduran.footballwithfriends.server.service.MatchService;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +30,27 @@ public class MatchServiceImpl implements MatchService {
     private IMatchRepository matchRepository;
     
     @Autowired
+    private IPlayerRepository playerRepository;
+    
+    @Autowired
     private FWFMailSenderService mailSender;
 
     @Override
     public void createMatch(Match match) {
         matchRepository.insert(match);
-        mailSender.sendMailToAll("FWF say hello", "Partido Creado");
+        mailSender.sendMailToAll("FWF says hello", "Partido Creado");
     }
 
     @Override
     public void deleteMatch(String matchId) {
         matchRepository.deleteById(matchId);
-        mailSender.sendMailToAll("FWF say hello", "Partido Eliminado");
+        mailSender.sendMailToAll("FWF says hello", "Partido Eliminado");
     }
 
     @Override
     public void updateMatch(Match match) {
         matchRepository.save(match);
-        mailSender.sendMailToAll("FWF say hello", "Partido Actualizado");
+        mailSender.sendMailToAll("FWF says hello", "Partido Actualizado");
     }
 
     @Override
@@ -60,26 +66,83 @@ public class MatchServiceImpl implements MatchService {
     @Override
     synchronized public void joinPlayerCallUp(String matchId, Player player) {
         Match match = matchRepository.findById(matchId).get();
-        if (match.getCallUp() == null) {
-            List<PlayerCallUp> callUp = new ArrayList<>();     
-            match.setCallUp(callUp);
-        }        
+        Boolean joinAsReserve = false;
+        String idPlayerReserved = null;
+        if (match.getCallUp() == null) {     
+            match.setCallUp(new ArrayList<>());
+        }      
+        if (match.getCallUp().size() == match.getNumPlayers()) {
+            if (!player.getFixed()) {
+                joinAsReserve = true;
+            } else {
+                List<PlayerCallUp> listNoFixed =
+                        match.getCallUp().stream()
+                                .filter(el -> !el.getPlayer().getFixed())
+                                .sorted(Comparator.comparing(PlayerCallUp::getDateCallUp).reversed())
+                                .collect(Collectors.toList());
+                if (listNoFixed.size() > 0) {
+                    if (match.getReserves() == null) {
+                        match.setReserves(new ArrayList<>());
+                    }
+                    match.getReserves().add(listNoFixed.get(0));                    
+                    match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(listNoFixed.get(0).getPlayer().getId()));
+                    idPlayerReserved = listNoFixed.get(0).getPlayer().getId();
+                } else {
+                    throw new RuntimeException("Parece que hay mas fijos que jugadores en el partido");
+                }
+            }
+        }
         PlayerCallUp playerCallUp = new PlayerCallUp();
         playerCallUp.setDateCallUp(new Date());
         SimplyPlayer simplyPlayer = new SimplyPlayer(player.getAlias(), player.getId(), player.getFixed());
         playerCallUp.setPlayer(simplyPlayer);
-        match.getCallUp().add(playerCallUp);
+        if (joinAsReserve) {
+            if (match.getReserves() == null) {
+                match.setReserves(new ArrayList<>());
+            }
+            match.getReserves().add(playerCallUp);
+        } else {
+            match.getCallUp().add(playerCallUp);
+        }
         matchRepository.save(match);
         if (player.getEmail() != null && !player.getEmail().equals("")) {
-            mailSender.sendMail(player.getEmail(), "FWF say hello", "Te has unido al Partido " + match.getName());
+            if (joinAsReserve) {
+                mailSender.sendMail(player.getEmail(), "FWF says hello", "Estás en la reserva para el partido " + match.getName());
+            } else {
+                mailSender.sendMail(player.getEmail(), "FWF says hello", "Te has unido al Partido " + match.getName());
+            }
+        }
+        if (idPlayerReserved != null) {
+            Player playerReserved = playerRepository.findById(idPlayerReserved).get();
+            if (playerReserved.getEmail() != null && !playerReserved.getEmail().equals("")) {
+                mailSender.sendMail(playerReserved.getEmail(), "FWF says hello", "Lo siento, pasas a estar en la reserva para el partido " + match.getName());
+            }
         }
     }
     
     @Override
     synchronized public void unJoinPlayerCallUp(String matchId, String playerId) {
         Match match = matchRepository.findById(matchId).get();
-        match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(playerId));        
+        String idRecoveredPlayer = null;
+        Boolean playerInCallUp = match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(playerId));
+        if (playerInCallUp && match.getReserves() != null && match.getReserves().size() > 0) {
+            List<PlayerCallUp> listReserves =
+                        match.getReserves().stream()
+                                .sorted(Comparator.comparing(PlayerCallUp::getDateCallUp))
+                                .collect(Collectors.toList());
+            match.getCallUp().add(listReserves.get(0));
+            idRecoveredPlayer = listReserves.get(0).getPlayer().getId();
+            match.getReserves().removeIf(item -> item.getPlayer().getId().equals(listReserves.get(0).getPlayer().getId()));
+        } else {
+            match.getReserves().removeIf(item -> item.getPlayer().getId().equals(playerId));
+        }        
         matchRepository.save(match);
+        if (idRecoveredPlayer != null) {
+            Player playerRecovered = playerRepository.findById(idRecoveredPlayer).get();
+            if (playerRecovered.getEmail() != null && !playerRecovered.getEmail().equals("")) {
+                mailSender.sendMail(playerRecovered.getEmail(), "FWF says hello", "Enhorabuena, pasas a estar en la convocatoria para el partido " + match.getName());
+            }
+        }
     }
 
     @Override
@@ -89,7 +152,7 @@ public class MatchServiceImpl implements MatchService {
         match.setTeam2(teams.get(1));
         
         matchRepository.save(match);
-        mailSender.sendMailToAll("FWF say hello", "Equipos creados para el Partido " + match.getName());
+        mailSender.sendMailToAll("FWF says hello", "Equipos creados para el Partido " + match.getName());
     }
     
     @Override
@@ -107,7 +170,7 @@ public class MatchServiceImpl implements MatchService {
     synchronized public void unjoinPlayerDiscards(String matchId, String playerId) {
         Match match = matchRepository.findById(matchId).get();
         if (match.getDiscards() != null) {
-            match.getDiscards().removeIf(item -> item.getPlayer().getPlayer().getId().equals(playerId));            
+            match.getDiscards().removeIf(item -> item.getPlayer().getId().equals(playerId));            
             matchRepository.save(match);
         }        
     }

@@ -10,7 +10,6 @@ import com.jmduran.footballwithfriends.server.enums.TeamColor;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -25,9 +24,7 @@ public class Match implements Serializable {
     
     @Id
     String id;
-    @NotNull
     String name;
-    @NotNull
     Date date;
     Team team1;
     Team team2;
@@ -38,6 +35,7 @@ public class Match implements Serializable {
     SimplyPlayer mister;
     Boolean cancelled;
     List<PlayerDiscard> discards;
+    List<PlayerCallUp> reserves;
     
     @Data
     public static class PlayerCallUp {        
@@ -70,7 +68,7 @@ public class Match implements Serializable {
     
     @Data
     public static class PlayerDiscard {
-        PlayerCallUp player;
-        Boolean canPlay;
+        SimplyPlayer player;
+        Date dateDiscard;
     }
 }
