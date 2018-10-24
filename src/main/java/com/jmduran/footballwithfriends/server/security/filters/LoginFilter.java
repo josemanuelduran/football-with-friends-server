@@ -75,6 +75,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
         res.setContentType("application/json");
         FWFUserDetails userDetails = (FWFUserDetails)auth.getPrincipal();
         UserResponse userResponse = new UserResponse();
+        userResponse.setId(userDetails.getId());
         userResponse.setFullName(userDetails.getFullName());
         userResponse.setPlayerId(userDetails.getPlayerId());
         userResponse.setUsername(userDetails.getUsername());
@@ -84,6 +85,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     
     @Data
     class UserResponse {
+        String id;
         String username;
         String fullName;
         String playerId;

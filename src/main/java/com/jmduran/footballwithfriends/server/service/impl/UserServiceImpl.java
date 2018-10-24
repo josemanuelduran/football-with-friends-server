@@ -31,6 +31,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UserFWF user) {
+        if (user.getPassword() == null) {
+            UserFWF userOrigin = userRepository.findById(user.getId()).get();
+            user.setPassword(userOrigin.getPassword());
+        }
         userRepository.save(user);
     }
 

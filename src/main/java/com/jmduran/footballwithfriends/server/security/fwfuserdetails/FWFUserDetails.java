@@ -23,6 +23,7 @@ public class FWFUserDetails extends User {
         super(username, password, authorities);
     }
 
+    String id;
     String fullName;
     List<Role> roles;
     String playerId;
