@@ -45,6 +45,7 @@ public class MongoDBAuthenticationProvider extends AbstractUserDetailsAuthentica
                             .map(role -> new SimpleGrantedAuthority(role.toString()))
                             .collect(Collectors.toList());
                 loadedUser = new FWFUserDetails(user.getUsername(), user.getPassword(), roles);
+                loadedUser.setId(user.getId());
                 loadedUser.setFullName(user.getFullName());
                 loadedUser.setPlayerId(user.getPlayerId());
                 loadedUser.setRoles(user.getRoles());

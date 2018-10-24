@@ -46,8 +46,10 @@ public class UsersController {
     @RequestMapping(value = "", 
                     method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@RequestBody UserFWF user){    
-        user.setPassword(DigestUtils.sha1Hex(user.getPassword()));
+    public void updateUser(@RequestBody UserFWF user){  
+        if (user.getPassword() != null) {
+            user.setPassword(DigestUtils.sha1Hex(user.getPassword()));
+        }
         service.updateUser(user);
     }
     
