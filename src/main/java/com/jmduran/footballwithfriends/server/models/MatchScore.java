@@ -1,28 +1,38 @@
+/*
+ * Copyright (C) 2018 Jose Manuel Duran
+ * 
+ * License GPL-3.0 or later (http://www.gnu.org/licenses/gpl-3.0)
+ *
+ */
 package com.jmduran.footballwithfriends.server.models;
 
 import java.util.Date;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- *
- * @author Jose Manuel Durán
- */
 @Data
 @Builder
+@Document(collection = "matchScore")
 public class MatchScore {
     
-    Player player;
-    Float score;
-    Match match;
-    List<Jury> juryScores;
+    @Id
+    String id;
+    String playerId;
+    String matchId;
+    Date date;
+    List<Score> scores;
     
-    class Jury {
+    @Data
+    @Builder
+    public static class Score {
         
-        Player jury;
+        String namePlayer;
+        String idPlayer;
         Integer score;
-        Date date;
         
     }
+
 }

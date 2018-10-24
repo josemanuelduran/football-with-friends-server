@@ -24,8 +24,8 @@ public class JwtUtil {
         String secret = System.getenv("FWF_TOKEN_SECRET");
         String token = Jwts.builder()
             .setSubject(username)             
-            // Expiration time of 10 minutes
-            .setExpiration(new Date(System.currentTimeMillis() + 600000))            
+            // Expiration time of 100 minutes
+            .setExpiration(new Date(System.currentTimeMillis() + 6000000))            
             // Hash to sing the key
             .signWith(SignatureAlgorithm.HS512, secret)
             .compact();
