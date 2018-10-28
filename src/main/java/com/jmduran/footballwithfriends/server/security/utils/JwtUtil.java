@@ -6,14 +6,12 @@
  */
 package com.jmduran.footballwithfriends.server.security.utils;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import static java.util.Collections.emptyList;
 import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -40,16 +38,12 @@ public class JwtUtil {
         
         if (token != null) {
             String user = null;
-            try {
-                String secret = System.getenv("FWF_TOKEN_SECRET");
-                user = Jwts.parser()
-                        .setSigningKey(secret)
-                        .parseClaimsJws(token.replace("Bearer", "")) //este metodo es el que valida
-                        .getBody()
-                        .getSubject();
-            }catch (ExpiredJwtException expJwt) {
-                throw new InternalAuthenticationServiceException(expJwt.getMessage());
-            }
+            String secret = System.getenv("FWF_TOKEN_SECRET");
+            user = Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token.replace("Bearer", "")) //este metodo es el que valida
+                    .getBody()
+                    .getSubject();
 
             // Recordamos que para las demás peticiones que no sean /login
             // no requerimos una autenticacion por username/password 
