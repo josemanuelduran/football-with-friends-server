@@ -16,5 +16,6 @@ public interface UserService {
     void updateUser(UserFWF user);    
     List<UserFWF> getUsers();
     UserFWF getUser(String userId);   
+    void changePassword(String userId, String token);
     
 }
