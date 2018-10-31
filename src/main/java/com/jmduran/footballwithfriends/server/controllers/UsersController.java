@@ -72,5 +72,12 @@ public class UsersController {
             response = new ResponseEntity<>(user, HttpStatus.OK);            
         }        
         return response;
-    }        
+    }
+    
+    @RequestMapping(value = "/{userId}/changePassword", 
+                    method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public void changePassword(@PathVariable String userId, @RequestBody String token){        
+        service.changePassword(userId, token);
+    }
 }
