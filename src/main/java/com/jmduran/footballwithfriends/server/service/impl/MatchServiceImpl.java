@@ -40,19 +40,28 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public void createMatch(Match match) {
         matchRepository.insert(match);
-        mailSender.sendMailToAll("FWF says hello", "Partido Creado");
+        //mailSender.sendMailToAll("FWF says hello", "Partido Creado");
     }
 
     @Override
     public void deleteMatch(String matchId) {
         matchRepository.deleteById(matchId);
-        mailSender.sendMailToAll("FWF says hello", "Partido Eliminado");
+        //mailSender.sendMailToAll("FWF says hello", "Partido Eliminado");
     }
 
     @Override
     public void updateMatch(Match match) {
+        Match oldMatch = matchRepository.findById(match.getId()).get();
         matchRepository.save(match);
-        mailSender.sendMailToAll("FWF says hello", "Partido Actualizado");
+        if (!oldMatch.getCancelled() && match.getCancelled()) {
+            mailSender.sendMailToAll(ASUNTO, 
+                    "Vaya, que mala suerte, el partido " + match.getName() +
+                    " ha sido cancelado");
+        } else if (!oldMatch.getOpenCallUp()&& match.getOpenCallUp()) {
+            mailSender.sendMailToAll(ASUNTO, 
+                    "La convocatoria del partido " + match.getName() +
+                    " se ha abierto./nApúntate rápido!!!");
+        }
     }
 
     @Override
@@ -144,7 +153,8 @@ public class MatchServiceImpl implements MatchService {
         if (idRecoveredPlayer != null) {
             Player playerRecovered = playerRepository.findById(idRecoveredPlayer).get();
             if (playerRecovered.getEmail() != null && !playerRecovered.getEmail().equals("")) {
-                mailSender.sendMail(playerRecovered.getEmail(), ASUNTO, "Enhorabuena, acabas de entrar en la convocatoria para el partido " + match.getName());
+                mailSender.sendMail(playerRecovered.getEmail(), ASUNTO, 
+                        "Enhorabuena, acabas de entrar en la convocatoria para el partido " + match.getName());
             }
         }
     }
