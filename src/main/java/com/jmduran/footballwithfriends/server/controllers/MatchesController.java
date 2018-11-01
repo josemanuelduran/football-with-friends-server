@@ -88,7 +88,7 @@ public class MatchesController {
                     method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Match> getMatches(){        
-        return service.getMatchs();
+        return service.getMatches();
     }
     
     @RequestMapping(value = "/{matchId}", 

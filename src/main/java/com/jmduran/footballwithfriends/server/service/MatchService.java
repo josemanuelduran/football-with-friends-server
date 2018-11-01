@@ -15,7 +15,7 @@ public interface MatchService {
     void createMatch(Match match);
     void deleteMatch(String matchId);
     void updateMatch(Match match);    
-    List<Match> getMatchs();
+    List<Match> getMatches();
     Match getMatch(String matchId); 
     void joinPlayerCallUp(String matchId, Player player);
     void unJoinPlayerCallUp(String matchId, String playerId);
