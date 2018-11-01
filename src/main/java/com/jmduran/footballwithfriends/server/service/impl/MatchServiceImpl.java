@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class MatchServiceImpl implements MatchService {
 
+    private static final String ASUNTO = "Fútbol con Amigos: Notificación"; 
+    
     @Autowired
     private IMatchRepository matchRepository;
     
@@ -54,7 +56,7 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public List<Match> getMatchs() {
+    public List<Match> getMatches() {
         return matchRepository.findAll();
     }
 
@@ -107,15 +109,17 @@ public class MatchServiceImpl implements MatchService {
         matchRepository.save(match);
         if (player.getEmail() != null && !player.getEmail().equals("")) {
             if (joinAsReserve) {
-                mailSender.sendMail(player.getEmail(), "FWF says hello", "Estás en la reserva para el partido " + match.getName());
+                mailSender.sendMail(player.getEmail(), ASUNTO, "Lo siento, pero eres reserva para el partido " + match.getName());
             } else {
-                mailSender.sendMail(player.getEmail(), "FWF says hello", "Te has unido al Partido " + match.getName());
+                mailSender.sendMail(player.getEmail(), ASUNTO, "Enhorabuena, estás convocado para el partido " + match.getName());
             }
         }
         if (idPlayerReserved != null) {
             Player playerReserved = playerRepository.findById(idPlayerReserved).get();
             if (playerReserved.getEmail() != null && !playerReserved.getEmail().equals("")) {
-                mailSender.sendMail(playerReserved.getEmail(), "FWF says hello", "Lo siento, pasas a estar en la reserva para el partido " + match.getName());
+                mailSender.sendMail(playerReserved.getEmail(), ASUNTO, 
+                        "Lo siento, pasas a estar en la reserva para el partido " + match.getName() +
+                        " /n" + player.getAlias() + " ha entrado en tu lugar");
             }
         }
     }
@@ -140,7 +144,7 @@ public class MatchServiceImpl implements MatchService {
         if (idRecoveredPlayer != null) {
             Player playerRecovered = playerRepository.findById(idRecoveredPlayer).get();
             if (playerRecovered.getEmail() != null && !playerRecovered.getEmail().equals("")) {
-                mailSender.sendMail(playerRecovered.getEmail(), "FWF says hello", "Enhorabuena, pasas a estar en la convocatoria para el partido " + match.getName());
+                mailSender.sendMail(playerRecovered.getEmail(), ASUNTO, "Enhorabuena, acabas de entrar en la convocatoria para el partido " + match.getName());
             }
         }
     }
@@ -152,7 +156,9 @@ public class MatchServiceImpl implements MatchService {
         match.setTeam2(teams.get(1));
         
         matchRepository.save(match);
-        mailSender.sendMailToAll("FWF says hello", "Equipos creados para el Partido " + match.getName());
+        mailSender.sendMailToAll(ASUNTO, 
+                "Ya están los equipos para el partido " + match.getName() + "./n" +
+                "Vaya equipito te ha tocado!!! /nEntra en la aplicación y compruébalo.");
     }
     
     @Override
