@@ -137,7 +137,7 @@ public class MatchServiceImpl implements MatchService {
             match.getCallUp().add(listReserves.get(0));
             idRecoveredPlayer = listReserves.get(0).getPlayer().getId();
             match.getReserves().removeIf(item -> item.getPlayer().getId().equals(listReserves.get(0).getPlayer().getId()));
-        } else {
+        } else if (match.getReserves() != null && match.getReserves().size() > 0){
             match.getReserves().removeIf(item -> item.getPlayer().getId().equals(playerId));
         }        
         matchRepository.save(match);
