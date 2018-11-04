@@ -36,9 +36,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(UserFWF user) {
-        if (user.getPassword() == null) {
-            UserFWF userOrigin = userRepository.findById(user.getId()).get();
+        UserFWF userOrigin = userRepository.findById(user.getId()).get();
+        if (user.getPassword() == null) {            
             user.setPassword(userOrigin.getPassword());
+        }
+        if (!user.getUsername().equals(userOrigin.getUsername())) {
+            UserFWF userWithSameUsername = userRepository.findByUsername(user.getUsername());
+            if (userWithSameUsername != null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "The entered username is already being used by another user");
+            }
         }
         userRepository.save(user);
     }
