@@ -10,9 +10,11 @@ import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Player;
 import com.jmduran.footballwithfriends.server.service.PlayerService;
 import java.util.List;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,11 +27,15 @@ public class FWFMailSenderService {
     private PlayerService playerService;
     
     public void sendMail(String to, String subject, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(to);
-            message.setSubject(subject);
-            message.setText(body); 
-            mailSender.send(message);
+        try {
+            MimeMessage mail = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+            mailSender.send(mail);
+        } catch (MessagingException ex) {
+        }
     }
     
     public void sendMailToAll(String subject, String body) {
@@ -37,11 +43,15 @@ public class FWFMailSenderService {
         players.stream().forEach(player -> {
             String email = player.getEmail();
             if (email != null && !email.equals("")){
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(email);
-                message.setSubject(subject);
-                message.setText(body); 
-                mailSender.send(message); 
+                try {
+                    MimeMessage mail = mailSender.createMimeMessage();
+                    MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+                    helper.setTo(email);
+                    helper.setSubject(subject);
+                    helper.setText(body, true);
+                    mailSender.send(mail);
+                } catch (MessagingException ex) {
+                }
             }
         });
     }
@@ -55,11 +65,15 @@ public class FWFMailSenderService {
             .forEach(playerMatch -> {
                 String email = playerMatch.getEmail();
                 if (email != null && !email.equals("")){
-                    SimpleMailMessage message = new SimpleMailMessage();
-                    message.setTo(email);
-                    message.setSubject(subject);
-                    message.setText(body); 
-                    mailSender.send(message); 
+                    try {
+                        MimeMessage mail = mailSender.createMimeMessage();
+                        MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+                        helper.setTo(email);
+                        helper.setSubject(subject);
+                        helper.setText(body, true);
+                        mailSender.send(mail);
+                    } catch (MessagingException ex) {
+                    } 
                 }
         });
     }
