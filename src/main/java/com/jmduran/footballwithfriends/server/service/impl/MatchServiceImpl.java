@@ -40,13 +40,11 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public void createMatch(Match match) {
         matchRepository.insert(match);
-        //mailSender.sendMailToAll("FWF says hello", "Partido Creado");
     }
 
     @Override
     public void deleteMatch(String matchId) {
         matchRepository.deleteById(matchId);
-        //mailSender.sendMailToAll("FWF says hello", "Partido Eliminado");
     }
 
     @Override
@@ -60,7 +58,7 @@ public class MatchServiceImpl implements MatchService {
         } else if (!oldMatch.getOpenCallUp()&& match.getOpenCallUp()) {
             mailSender.sendMailToAll(ASUNTO, 
                     "La convocatoria del partido " + match.getName() +
-                    " se ha abierto./nApúntate rápido!!!");
+                    " se ha abierto.<br>Apúntate rápido!!!");
         }
     }
 
@@ -118,17 +116,19 @@ public class MatchServiceImpl implements MatchService {
         matchRepository.save(match);
         if (player.getEmail() != null && !player.getEmail().equals("")) {
             if (joinAsReserve) {
-                mailSender.sendMail(player.getEmail(), ASUNTO, "Lo siento, pero eres reserva para el partido " + match.getName());
+                mailSender.sendMail(player.getEmail(), ASUNTO, 
+                        "Lo siento " + player.getAlias()  + ", pero de momento eres reserva para el partido " + match.getName());
             } else {
-                mailSender.sendMail(player.getEmail(), ASUNTO, "Enhorabuena, estás convocado para el partido " + match.getName());
+                mailSender.sendMail(player.getEmail(), ASUNTO, 
+                        "Enhorabuena " + player.getAlias()  + ", estás convocado para el partido " + match.getName());
             }
         }
         if (idPlayerReserved != null) {
             Player playerReserved = playerRepository.findById(idPlayerReserved).get();
             if (playerReserved.getEmail() != null && !playerReserved.getEmail().equals("")) {
                 mailSender.sendMail(playerReserved.getEmail(), ASUNTO, 
-                        "Lo siento, pasas a estar en la reserva para el partido " + match.getName() +
-                        " /n" + player.getAlias() + " ha entrado en tu lugar");
+                        "Lo siento " + playerReserved.getAlias()  + ", pasas a estar en la reserva para el partido " + match.getName() +
+                        " <br>" + player.getAlias() + " ha entrado en tu lugar");
             }
         }
     }
@@ -154,7 +154,7 @@ public class MatchServiceImpl implements MatchService {
             Player playerRecovered = playerRepository.findById(idRecoveredPlayer).get();
             if (playerRecovered.getEmail() != null && !playerRecovered.getEmail().equals("")) {
                 mailSender.sendMail(playerRecovered.getEmail(), ASUNTO, 
-                        "Enhorabuena, acabas de entrar en la convocatoria para el partido " + match.getName());
+                        "Enhorabuena " + playerRecovered.getAlias()  + ", acabas de entrar en la convocatoria para el partido " + match.getName());
             }
         }
     }
@@ -167,8 +167,8 @@ public class MatchServiceImpl implements MatchService {
         
         matchRepository.save(match);
         mailSender.sendMailToAll(ASUNTO, 
-                "Ya están los equipos para el partido " + match.getName() + "./n" +
-                "Vaya equipito te ha tocado!!! /nEntra en la aplicación y compruébalo.");
+                "Ya están los equipos para el partido " + match.getName() +
+                ".<br>¡¡¡Vaya equipito te ha tocado!!! <br>Entra en la aplicación y compruébalo.");
     }
     
     @Override
