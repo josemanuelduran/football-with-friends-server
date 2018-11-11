@@ -8,6 +8,7 @@ package com.jmduran.footballwithfriends.server.controllers;
 
 import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Player;
+import com.jmduran.footballwithfriends.server.models.PlayerScore;
 import com.jmduran.footballwithfriends.server.service.MatchService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,5 +104,12 @@ public class MatchesController {
             response = new ResponseEntity<>(match, HttpStatus.OK);            
         }        
         return response;
-    }        
+    }  
+    
+    @RequestMapping(value = "/{matchId}/scores", 
+                    method = RequestMethod.GET, 
+                    produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<PlayerScore> getPlayerScores(@PathVariable String matchId){        
+        return service.getPlayerScores(matchId);
+    }  
 }

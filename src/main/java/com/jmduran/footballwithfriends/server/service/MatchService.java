@@ -8,6 +8,7 @@ package com.jmduran.footballwithfriends.server.service;
 
 import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Player;
+import com.jmduran.footballwithfriends.server.models.PlayerScore;
 import java.util.List;
 
 public interface MatchService {
@@ -22,5 +23,6 @@ public interface MatchService {
     void updateTeams(String matchId, List<Match.Team> teams);
     void joinPlayerDiscards(String matchId, Match.PlayerDiscard player);
     void unjoinPlayerDiscards(String matchId, String playerId);
+    List<PlayerScore> getPlayerScores(String matchId);
     
 }

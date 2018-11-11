@@ -11,8 +11,11 @@ import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Match.PlayerCallUp;
 import com.jmduran.footballwithfriends.server.models.Match.PlayerDiscard;
 import com.jmduran.footballwithfriends.server.models.Match.SimplyPlayer;
+import com.jmduran.footballwithfriends.server.models.MatchScore;
 import com.jmduran.footballwithfriends.server.models.Player;
+import com.jmduran.footballwithfriends.server.models.PlayerScore;
 import com.jmduran.footballwithfriends.server.repositories.IMatchRepository;
+import com.jmduran.footballwithfriends.server.repositories.IMatchScoreRepository;
 import com.jmduran.footballwithfriends.server.repositories.IPlayerRepository;
 import com.jmduran.footballwithfriends.server.service.MatchService;
 import java.util.ArrayList;
@@ -33,6 +36,9 @@ public class MatchServiceImpl implements MatchService {
     
     @Autowired
     private IPlayerRepository playerRepository;
+    
+    @Autowired
+    private IMatchScoreRepository matchScoreRepository;
     
     @Autowired
     private FWFMailSenderService mailSender;
@@ -189,5 +195,39 @@ public class MatchServiceImpl implements MatchService {
             match.getDiscards().removeIf(item -> item.getPlayer().getId().equals(playerId));            
             matchRepository.save(match);
         }        
+    }
+
+    @Override
+    public List<PlayerScore> getPlayerScores(String matchId) {
+        List<MatchScore> matchScores = matchScoreRepository.findByMatchId(matchId);
+        List<PlayerScore> playerScores = new ArrayList<>();
+        matchScores.stream().forEach(matchScore -> {
+            matchScore.getScores().stream().forEach(score -> {
+                boolean playerIn = false;
+                for (PlayerScore playerScore : playerScores) {
+                    if (playerScore.getPlayer().getId().equals(score.getIdPlayer())) {
+                        playerIn = true;
+                        if (score.getScore() != null) {
+                            Integer currentTotalScore = playerScore.getTotalScore();
+                            if (currentTotalScore == null) {
+                                currentTotalScore = 0;
+                            } 
+                            playerScore.setTotalScore(currentTotalScore + score.getScore());
+                            playerScore.setNumVotes(playerScore.getNumVotes() + 1);
+                        }
+                    }
+                }
+                if (!playerIn) {
+                    playerScores.add(
+                        new PlayerScore(
+                            new PlayerScore.SimplyPlayer(score.getNamePlayer(), score.getIdPlayer()),
+                            score.getScore(),
+                            score.getScore() != null ? 1 : 0
+                        )
+                    );
+                }                 
+            });
+        });
+        return playerScores;
     }
 }

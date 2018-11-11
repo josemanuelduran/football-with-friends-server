@@ -16,8 +16,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "playerScore")
 public class PlayerScore {
     
-    Player player;
-    Float score;
-    Date dateScore;
+    SimplyPlayer player;
+    Integer totalScore;
+    Integer numVotes;
+
+    public PlayerScore() {
+    }
     
+    public PlayerScore(SimplyPlayer player, Integer score, Integer numVotes) {
+        this.player = player;
+        this.totalScore = score;
+        this.numVotes = numVotes;
+    }
+    
+    @Data
+    public static class SimplyPlayer {
+        String name;
+        String id;
+
+        public SimplyPlayer() {
+        }
+        
+        public SimplyPlayer(String name, String id) {
+            this.name = name;
+            this.id = id;
+        }
+    }
 }
