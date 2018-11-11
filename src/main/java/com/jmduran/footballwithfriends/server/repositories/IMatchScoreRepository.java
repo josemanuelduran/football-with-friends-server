@@ -7,10 +7,12 @@
 package com.jmduran.footballwithfriends.server.repositories;
 
 import com.jmduran.footballwithfriends.server.models.MatchScore;
+import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface IMatchScoreRepository extends MongoRepository<MatchScore, String>{
 
     MatchScore findByMatchIdAndPlayerId(String matchId, String playerId);
+    List<MatchScore> findByMatchId(String matchId);
     
 }
