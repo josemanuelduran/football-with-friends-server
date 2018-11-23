@@ -64,11 +64,11 @@ public class MatchesController {
         service.unJoinPlayerCallUp(matchId, playerId);
     }
     
-    @RequestMapping(value = "/{matchId}/teams", 
+    @RequestMapping(value = "/{matchId}/teams/{playerId}", 
                     method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public void updateTeams(@PathVariable String matchId, @RequestBody List<Match.Team> teams ){        
-        service.updateTeams(matchId, teams);
+    public void updateTeams(@PathVariable String matchId, @PathVariable String playerId, @RequestBody List<Match.Team> teams ){        
+        service.updateTeams(matchId, playerId, teams);
     }
     
     @RequestMapping(value = "/{matchId}/discards", 

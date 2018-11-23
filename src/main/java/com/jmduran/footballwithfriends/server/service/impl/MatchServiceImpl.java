@@ -177,15 +177,23 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    synchronized public void updateTeams(String matchId, List<Match.Team> teams) {
+    synchronized public void updateTeams(String matchId, String playerId, List<Match.Team> teams) {
         Match match = matchRepository.findById(matchId).get();
+        Player coach = playerRepository.findById(playerId).get();
+        String message = "";
+        if (match.getTeam1() == null && match.getTeam2() == null) {
+            message = "Ya están los equipos para el partido " + match.getName() +
+                ".<br>¡¡¡Vaya equipito te ha tocado!!! <br>Entra en la aplicación y compruébalo.";
+        } else {
+            message = coach.getAlias() + " ha modificado los equipos para el partido " + match.getName() +
+                ".<br>Entra en la aplicación y comprueba los cambios.";
+        }
         match.setTeam1(teams.get(0));
         match.setTeam2(teams.get(1));
+        match.setMister(new SimplyPlayer(coach.getAlias(), playerId, coach.getFixed()));
         
         matchRepository.save(match);
-        mailSender.sendMailToAll(ASUNTO, 
-                "Ya están los equipos para el partido " + match.getName() +
-                ".<br>¡¡¡Vaya equipito te ha tocado!!! <br>Entra en la aplicación y compruébalo.");
+        mailSender.sendMailToMatchPlayers(match, ASUNTO, message);
     }
     
     @Override
