@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,11 +84,21 @@ public class MatchServiceImpl implements MatchService {
         Match match = matchRepository.findById(matchId).get();
         Boolean joinAsReserve = false;
         String idPlayerReserved = null;
+        Optional<Player> optionalPlayerFound = playerRepository.findById(player.getId());
+        Player playerFound;
+        if (optionalPlayerFound.isPresent()) {
+            playerFound = optionalPlayerFound.get();
+        } else {
+            player.setId(null);
+            player.setActive(true);
+            player.setRegisterDate(new Date());
+            playerFound = playerRepository.insert(player);
+        }
         if (match.getCallUp() == null) {     
             match.setCallUp(new ArrayList<>());
         }      
         if (match.getCallUp().size() == match.getNumPlayers()) {
-            if (!player.getFixed()) {
+            if (!playerFound.getFixed()) {
                 joinAsReserve = true;
             } else {
                 List<PlayerCallUp> listNoFixed =
@@ -109,7 +120,7 @@ public class MatchServiceImpl implements MatchService {
         }
         PlayerCallUp playerCallUp = new PlayerCallUp();
         playerCallUp.setDateCallUp(new Date());
-        SimplyPlayer simplyPlayer = new SimplyPlayer(player.getAlias(), player.getId(), player.getFixed());
+        SimplyPlayer simplyPlayer = new SimplyPlayer(playerFound.getAlias(), playerFound.getId(), playerFound.getFixed());
         playerCallUp.setPlayer(simplyPlayer);
         if (joinAsReserve) {
             if (match.getReserves() == null) {
@@ -120,13 +131,13 @@ public class MatchServiceImpl implements MatchService {
             match.getCallUp().add(playerCallUp);
         }
         matchRepository.save(match);
-        if (player.getEmail() != null && !player.getEmail().equals("")) {
+        if (playerFound.getEmail() != null && !playerFound.getEmail().equals("")) {
             if (joinAsReserve) {
-                mailSender.sendMail(player.getEmail(), ASUNTO, 
-                        "Lo siento " + player.getAlias()  + ", pero de momento eres reserva para el partido " + match.getName());
+                mailSender.sendMail(playerFound.getEmail(), ASUNTO, 
+                        "Lo siento " + playerFound.getAlias()  + ", pero de momento eres reserva para el partido " + match.getName());
             } else {
-                mailSender.sendMail(player.getEmail(), ASUNTO, 
-                        "Enhorabuena " + player.getAlias()  + ", estás convocado para el partido " + match.getName());
+                mailSender.sendMail(playerFound.getEmail(), ASUNTO, 
+                        "Enhorabuena " + playerFound.getAlias()  + ", estás convocado para el partido " + match.getName());
             }
         }
         if (idPlayerReserved != null) {
@@ -134,7 +145,7 @@ public class MatchServiceImpl implements MatchService {
             if (playerReserved.getEmail() != null && !playerReserved.getEmail().equals("")) {
                 mailSender.sendMail(playerReserved.getEmail(), ASUNTO, 
                         "Lo siento " + playerReserved.getAlias()  + ", pasas a estar en la reserva para el partido " + match.getName() +
-                        " <br>" + player.getAlias() + " ha entrado en tu lugar");
+                        " <br>" + playerFound.getAlias() + " ha entrado en tu lugar");
             }
         }
     }
