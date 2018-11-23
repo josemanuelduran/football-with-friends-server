@@ -7,7 +7,11 @@
 package com.jmduran.footballwithfriends.server.repositories;
 
 import com.jmduran.footballwithfriends.server.models.Player;
+import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface IPlayerRepository extends MongoRepository<Player, String> {    
+public interface IPlayerRepository extends MongoRepository<Player, String> {
+    
+    List<Player> findByActive(Boolean active);
+    
 }
