@@ -65,7 +65,7 @@ public class MatchServiceImpl implements MatchService {
         } else if (!oldMatch.getOpenCallUp()&& match.getOpenCallUp()) {
             mailSender.sendMailToAll(ASUNTO, 
                     "La convocatoria del partido " + match.getName() +
-                    " se ha abierto.<br>Apúntate rápido!!!");
+                    " se ha abierto.<br>Apúntate rápido!!!<br>Y si no puedes jugar, por favor, metete como descarte.");
         }
     }
 
@@ -155,7 +155,8 @@ public class MatchServiceImpl implements MatchService {
         Match match = matchRepository.findById(matchId).get();
         String idRecoveredPlayer = null;
         Boolean playerInCallUp = match.getCallUp().removeIf(item -> item.getPlayer().getId().equals(playerId));
-        if (playerInCallUp && match.getReserves() != null && match.getReserves().size() > 0) {
+        if (playerInCallUp && (match.getCallUp().size() < match.getNumPlayers()) 
+                && match.getReserves() != null && match.getReserves().size() > 0) {
             List<PlayerCallUp> listReserves =
                         match.getReserves().stream()
                                 .sorted(Comparator.comparing(PlayerCallUp::getDateCallUp))
@@ -163,7 +164,7 @@ public class MatchServiceImpl implements MatchService {
             match.getCallUp().add(listReserves.get(0));
             idRecoveredPlayer = listReserves.get(0).getPlayer().getId();
             match.getReserves().removeIf(item -> item.getPlayer().getId().equals(listReserves.get(0).getPlayer().getId()));
-        } else if (match.getReserves() != null && match.getReserves().size() > 0){
+        } else if (!playerInCallUp && match.getReserves() != null && match.getReserves().size() > 0){
             match.getReserves().removeIf(item -> item.getPlayer().getId().equals(playerId));
         }        
         matchRepository.save(match);
