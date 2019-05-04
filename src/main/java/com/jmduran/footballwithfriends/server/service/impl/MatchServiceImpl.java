@@ -18,6 +18,7 @@ import com.jmduran.footballwithfriends.server.repositories.IMatchRepository;
 import com.jmduran.footballwithfriends.server.repositories.IMatchScoreRepository;
 import com.jmduran.footballwithfriends.server.repositories.IPlayerRepository;
 import com.jmduran.footballwithfriends.server.service.MatchService;
+import com.jmduran.footballwithfriends.server.service.PaymentService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -43,6 +44,9 @@ public class MatchServiceImpl implements MatchService {
     
     @Autowired
     private FWFMailSenderService mailSender;
+    
+    @Autowired
+    private PaymentService paymentService;
 
     @Override
     public void createMatch(Match match) {
@@ -58,6 +62,9 @@ public class MatchServiceImpl implements MatchService {
     public void updateMatch(Match match) {
         Match oldMatch = matchRepository.findById(match.getId()).get();
         matchRepository.save(match);
+        if (!oldMatch.getPlayed() && match.getPlayed()) {
+            this.paymentService.createMatchPayments(match);
+        }
         if (!oldMatch.getCancelled() && match.getCancelled()) {
             mailSender.sendMailToAll(ASUNTO, 
                     "Vaya, que mala suerte, el partido " + match.getName() +

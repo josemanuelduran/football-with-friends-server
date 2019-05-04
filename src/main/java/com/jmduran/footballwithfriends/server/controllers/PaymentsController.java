@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,8 +52,17 @@ public class PaymentsController {
     @RequestMapping(value = "", 
                     method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Payment> getPayments(){        
-        return service.getPayments();
+    public List<Payment> getPayments(
+            @RequestParam(value = "playerId", required = false) String playerId,
+            @RequestParam(value = "paid", required = false) Boolean paid,
+            @RequestParam(value = "year", required = false) Integer year
+    ){  
+        if (playerId == null) {
+            return service.getPayments();
+        } else {
+            return service.getPlayerPayments(playerId, paid, year);
+        }
+        
     }
     
     @RequestMapping(value = "/{paymentId}", 

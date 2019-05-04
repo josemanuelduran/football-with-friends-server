@@ -28,7 +28,10 @@ public class Payment implements Serializable {
     String playerId;
     Month month;
     Integer year;
-    Date paymentDate;
+    Date matchDate;
     String matchId;
+    Date paymentDate;
+    Boolean paid;
+    Float amount;
     
 }
