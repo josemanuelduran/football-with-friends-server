@@ -36,6 +36,7 @@ public class Match implements Serializable {
     Boolean cancelled;
     List<PlayerDiscard> discards;
     List<PlayerCallUp> reserves;
+    Boolean played;
     
     @Data
     public static class PlayerCallUp {        

@@ -10,7 +10,6 @@ import com.jmduran.footballwithfriends.server.models.Match;
 import com.jmduran.footballwithfriends.server.models.Player;
 import com.jmduran.footballwithfriends.server.service.PlayerService;
 import java.util.List;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,7 +33,8 @@ public class FWFMailSenderService {
             helper.setSubject(subject);
             helper.setText(body, true);
             mailSender.send(mail);
-        } catch (MessagingException ex) {
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
     
@@ -50,7 +50,7 @@ public class FWFMailSenderService {
                     helper.setSubject(subject);
                     helper.setText(body, true);
                     mailSender.send(mail);
-                } catch (MessagingException ex) {
+                } catch (Exception ex) {
                 }
             }
         });
@@ -72,7 +72,7 @@ public class FWFMailSenderService {
                         helper.setSubject(subject);
                         helper.setText(body, true);
                         mailSender.send(mail);
-                    } catch (MessagingException ex) {
+                    } catch (Exception ex) {
                     } 
                 }
         });

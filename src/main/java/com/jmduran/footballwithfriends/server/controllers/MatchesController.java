@@ -92,6 +92,16 @@ public class MatchesController {
         return service.getMatches();
     }
     
+//    @RequestMapping(value = "", 
+//                    method = RequestMethod.GET, 
+//                    produces = MediaType.APPLICATION_JSON_VALUE)
+//    public List<Match> getMatches(@RequestParam("year") String year, @RequestParam("months") String months){        
+//        List<Match> matches = service.getMatches();
+//        // filter
+//        //matches.stream().filter()
+//        return matches;
+//    }
+    
     @RequestMapping(value = "/{matchId}", 
                     method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
