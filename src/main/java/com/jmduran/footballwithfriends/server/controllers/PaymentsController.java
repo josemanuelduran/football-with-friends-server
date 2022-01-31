@@ -58,7 +58,14 @@ public class PaymentsController {
             @RequestParam(value = "year", required = false) Integer year
     ){  
         if (playerId == null) {
-            return service.getPayments();
+            List<Payment> result = service.getPayments();      
+            if (paid != null) {
+                result = result.stream().filter(el -> el.getPaid() == paid).collect(Collectors.toList());
+            }
+            if (year != null) {
+                result = result.stream().filter(el -> el.getYear() == year).collect(Collectors.toList());
+            }           
+            return result;
         } else {
             return service.getPlayerPayments(playerId, paid, year);
         }
