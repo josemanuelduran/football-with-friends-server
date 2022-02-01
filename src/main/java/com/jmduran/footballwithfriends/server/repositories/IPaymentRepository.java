@@ -10,6 +10,7 @@ import com.jmduran.footballwithfriends.server.models.Payment;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import java.time.Month;
 
 public interface IPaymentRepository extends MongoRepository<Payment, String> {
     
@@ -19,5 +20,7 @@ public interface IPaymentRepository extends MongoRepository<Payment, String> {
     @Query("{ 'playerId' : ?0, 'year' : ?1 }")
     List<Payment> getPlayerPaymentsByYear(String playerId, Integer year);
     @Query("{ 'playerId' : ?0, 'paid' : ?1 }")
-    List<Payment> getPlayerPaymentsByStatus(String playerId, Boolean paid);
+    List<Payment> getPlayerPaymentsByStatus(String playerId, Boolean paid);  
+    @Query("{ 'playerId' : ?0, 'year' : ?1, 'month' : ?2 }")
+    Payment getPlayerPaymentByYearAndMonth(String playerId, Integer year, Month month);
 }
