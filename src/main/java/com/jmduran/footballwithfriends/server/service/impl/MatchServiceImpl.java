@@ -255,6 +255,10 @@ public class MatchServiceImpl implements MatchService {
                 }                 
             });
         });
+        playerScores.stream().forEach(player -> {
+            Boolean voted = matchScores.stream().anyMatch(el -> el.getPlayerId().equals(player.getPlayer().getId()));
+            player.setVoted(voted);
+        });
         return playerScores;
     }
 }

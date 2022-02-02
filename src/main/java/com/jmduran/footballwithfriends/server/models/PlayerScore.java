@@ -19,10 +19,18 @@ public class PlayerScore {
     SimplyPlayer player;
     Integer totalScore;
     Integer numVotes;
+    Boolean voted;
 
     public PlayerScore() {
     }
     
+    public PlayerScore(SimplyPlayer player, Integer score, Integer numVotes, Boolean voted) {
+        this.player = player;
+        this.totalScore = score;
+        this.numVotes = numVotes;
+        this.voted = voted;
+    }
+
     public PlayerScore(SimplyPlayer player, Integer score, Integer numVotes) {
         this.player = player;
         this.totalScore = score;
