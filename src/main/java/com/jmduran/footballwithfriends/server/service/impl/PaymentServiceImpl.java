@@ -24,7 +24,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void createPayment(Payment payment) {
-        Payment duplicatePayment = paymentRepository.getPlayerPaymentByYearAndMonth(payment.getPlayerId(), payment.getYear(), payment.getMonth());
+        Payment duplicatePayment = null;
+        if (payment.getMonth() != null) {
+            duplicatePayment = paymentRepository.getPlayerPaymentByYearAndMonth(payment.getPlayerId(), payment.getYear(), payment.getMonth());
+        }
         if (duplicatePayment == null) {
             paymentRepository.insert(payment);
         }       
