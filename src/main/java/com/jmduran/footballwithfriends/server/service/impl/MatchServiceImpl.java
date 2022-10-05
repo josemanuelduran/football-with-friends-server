@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -259,6 +260,8 @@ public class MatchServiceImpl implements MatchService {
             Boolean voted = matchScores.stream().anyMatch(el -> el.getPlayerId().equals(player.getPlayer().getId()));
             player.setVoted(voted);
         });
-        return playerScores;
+        List<PlayerScore> result = playerScores.stream().filter(el -> !el.getPlayer().getId().equals("5ad75966c85fdf206c4d4ca9")).collect(Collectors.toList());
+        System.out.println(result);
+        return result;
     }
 }
